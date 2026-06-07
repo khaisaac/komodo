@@ -1,0 +1,412 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum TripType {
+  OPEN_TRIP
+  LIVEABOARD
+}
+
+enum FacilityType {
+  INCLUSION
+  EXCLUSION
+}
+
+enum CabinType {
+  PRIVATE
+  SHARING
+  DORMITORY
+}
+
+enum ScheduleStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  DP_PAID
+  PAID
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentType {
+  FULL
+  DP_30
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String
+  phone         String?
+  nationality   String?
+  role          Role      @default(USER)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  accounts      Account[]
+  bookings      Booking[]
+  reviews       Review[]
+  blogs         Blog[]
+
+  @@index([email])
+  @@index([deletedAt])
+}
+
+model Boat {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?   @db.Text
+  specifications Json?    // e.g., length, width, engine, speed
+  amenities     Json?     // Array of strings (AC, Sun Deck, etc.)
+  featuredImage String?
+  gallery       Json?     // Array of image URLs
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  cabins        Cabin[]
+  schedules     TripSchedule[]
+
+  @@index([slug])
+  @@index([deletedAt])
+}
+
+model Cabin {
+  id            String    @id @default(cuid())
+  boatId        String
+  name          String    
+  type          CabinType
+  capacity      Int       
+  basePrice     Decimal   @db.Decimal(10, 2)
+  amenities     Json?     
+  images        Json?     
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  boat          Boat      @relation(fields: [boatId], references: [id], onDelete: Cascade)
+  bookingCabins BookingCabin[]
+
+  @@index([boatId])
+  @@index([deletedAt])
+}
+
+model Trip {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  type          TripType
+  destination   String
+  durationDays  Int
+  durationNights Int
+  description   String    @db.Text
+  basePrice     Decimal   @db.Decimal(10, 2)
+  featuredImage String?
+  gallery       Json?     
+  status        PublishStatus @default(DRAFT)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  itineraries   TripItinerary[]
+  facilities    TripFacility[]
+  schedules     TripSchedule[]
+  reviews       Review[]
+
+  @@index([slug])
+  @@index([destination])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model TripItinerary {
+  id            String    @id @default(cuid())
+  tripId        String
+  dayNumber     Int
+  title         String
+  description   String    @db.Text
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  trip          Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+}
+
+model TripFacility {
+  id            String    @id @default(cuid())
+  tripId        String
+  type          FacilityType
+  name          String
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  trip          Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+}
+
+model TripSchedule {
+  id            String    @id @default(cuid())
+  tripId        String
+  boatId        String?   
+  startDate     DateTime
+  endDate       DateTime
+  totalSeats    Int
+  availableSeats Int
+  status        ScheduleStatus @default(SCHEDULED)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  trip          Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  boat          Boat?     @relation(fields: [boatId], references: [id])
+  bookings      Booking[]
+
+  @@index([tripId])
+  @@index([boatId])
+  @@index([startDate])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Booking {
+  id              String    @id @default(cuid())
+  bookingCode     String    @unique 
+  userId          String
+  tripScheduleId  String
+  voucherId       String?
+  
+  status          BookingStatus @default(PENDING)
+  paymentType     PaymentType   @default(FULL)
+  specialRequest  String?       @db.Text
+  
+  subtotal        Decimal   @db.Decimal(10, 2) 
+  discountAmount  Decimal   @db.Decimal(10, 2) @default(0)
+  grandTotal      Decimal   @db.Decimal(10, 2) 
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  user            User      @relation(fields: [userId], references: [id])
+  schedule        TripSchedule @relation(fields: [tripScheduleId], references: [id])
+  voucher         Voucher?  @relation(fields: [voucherId], references: [id])
+  
+  participants    BookingParticipant[]
+  bookedCabins    BookingCabin[]
+  payments        Payment[]
+
+  @@index([bookingCode])
+  @@index([userId])
+  @@index([tripScheduleId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model BookingCabin {
+  id            String    @id @default(cuid())
+  bookingId     String
+  cabinId       String
+  quantity      Int
+  priceAtBooking Decimal  @db.Decimal(10, 2) 
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  booking       Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  cabin         Cabin     @relation(fields: [cabinId], references: [id])
+
+  @@index([bookingId])
+  @@index([cabinId])
+}
+
+model BookingParticipant {
+  id            String    @id @default(cuid())
+  bookingId     String
+  name          String
+  age           Int?
+  isChild       Boolean   @default(false)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  booking       Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}
+
+model Payment {
+  id              String    @id @default(cuid())
+  bookingId       String
+  transactionId   String?   @unique 
+  amount          Decimal   @db.Decimal(10, 2)
+  method          String?   
+  status          PaymentStatus @default(PENDING)
+  paymentDate     DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  booking         Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([transactionId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Voucher {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  discountType    DiscountType
+  discountValue   Decimal   @db.Decimal(10, 2)
+  validFrom       DateTime
+  validTo         DateTime
+  usageLimit      Int?      
+  usedCount       Int       @default(0)
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  bookings        Booking[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model Review {
+  id            String    @id @default(cuid())
+  userId        String
+  tripId        String
+  rating        Int       
+  comment       String?   @db.Text
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip          Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tripId])
+  @@index([rating])
+  @@index([deletedAt])
+}
+
+model BlogCategory {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  
+  blogs         Blog[]
+
+  @@index([slug])
+  @@index([deletedAt])
+}
+
+model Blog {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  content       String    @db.Text
+  thumbnail     String?
+  authorId      String
+  categoryId    String
+  status        PublishStatus @default(DRAFT)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  author        User      @relation(fields: [authorId], references: [id])
+  category      BlogCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([deletedAt])
+}
