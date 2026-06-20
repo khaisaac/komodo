@@ -16,7 +16,9 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
           boat: true
         }
       },
-      user: true
+      user: true,
+      participants: true,
+      payments: true
     }
   });
 
@@ -27,7 +29,6 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
   const customerName = booking.user?.name || booking.guestName || 'Guest Unknown';
   const customerEmail = booking.user?.email || booking.guestEmail || '-';
   const customerPhone = booking.user?.phone || booking.guestPhone || '-';
-  const customerNationality = booking.user?.nationality || booking.guestNationality || '-';
   
   const itemName = booking.schedule?.trip?.title || booking.schedule?.boat?.name || 'Paket Tidak Diketahui';
   const itemType = booking.schedule?.trip ? 'Open Trip' : (booking.schedule?.boat ? 'Liveaboard / Charter' : 'Unknown');
@@ -88,7 +89,7 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
                 </div>
                 <div>
                   <div className="text-sm font-medium text-slate-500">Jumlah Peserta</div>
-                  <div className="font-medium text-slate-900">{booking.paxCount} Orang</div>
+                  <div className="font-medium text-slate-900">{booking.participants.length || 0} Orang</div>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-slate-500">Tanggal Keberangkatan</div>
@@ -122,15 +123,15 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
                 <div className="font-medium text-slate-900">{customerPhone}</div>
               </div>
               <div>
-                <div className="text-sm font-medium text-slate-500">Kewarganegaraan</div>
-                <div className="font-medium text-slate-900">{customerNationality}</div>
+                <div className="text-sm font-medium text-slate-500">Jumlah Peserta</div>
+                <div className="font-medium text-slate-900">{booking.participants.length || 0} Pax</div>
               </div>
             </div>
-            {booking.specialRequests && (
+            {booking.specialRequest && (
               <div className="mt-4 pt-4 border-t border-slate-100">
                 <div className="text-sm font-medium text-slate-500 mb-1">Permintaan Khusus (Special Requests)</div>
                 <p className="text-slate-800 text-sm bg-slate-50 p-3 rounded-xl border border-slate-100">
-                  {booking.specialRequests}
+                  {booking.specialRequest}
                 </p>
               </div>
             )}
@@ -146,8 +147,8 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
             </h2>
             <div className="space-y-3 mb-6">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-slate-500">Harga Paket ({booking.paxCount}x)</span>
-                <span className="font-medium text-slate-900">Rp {Number(booking.totalPrice).toLocaleString('id-ID')}</span>
+                <span className="text-slate-500">Harga Paket ({booking.participants.length || 0}x)</span>
+                <span className="font-medium text-slate-900">Rp {Number(booking.subtotal).toLocaleString('id-ID')}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-500">Fee Platform / Tax</span>
@@ -163,11 +164,11 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
               <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Gateway Info (DOKU)</div>
               <div className="text-sm flex justify-between">
                 <span className="text-slate-500">Invoice ID</span>
-                <span className="font-medium font-mono text-slate-900">{booking.paymentId || '-'}</span>
+                <span className="font-medium font-mono text-slate-900">{booking.payments[0]?.transactionId || '-'}</span>
               </div>
               <div className="text-sm flex justify-between">
                 <span className="text-slate-500">Metode</span>
-                <span className="font-medium text-slate-900">{booking.paymentMethod || '-'}</span>
+                <span className="font-medium text-slate-900">{booking.payments[0]?.method || '-'}</span>
               </div>
             </div>
           </div>

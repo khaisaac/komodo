@@ -14,8 +14,8 @@ export const {
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
+        token.id = user.id as string;
+        token.role = user.role as any;
       }
       return token;
     },
