@@ -1,14 +1,37 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Calendar, Users, Star, Heart, MapPin, Menu, User } from 'lucide-react';
+import { Search, Calendar, Users, MapPin, ShieldCheck, Zap, Lock, Headphones, ArrowRight } from 'lucide-react';
+import TripCard from '@/components/TripCard';
+import LiveaboardCard from '@/components/LiveaboardCard';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { prisma } from '@/lib/prisma';
 
 export const metadata = {
-  title: 'Sailora | Explore Komodo & Lombok by Liveaboard',
-  description: 'Experience the best island adventure in Komodo and Lombok. Book your liveaboard and open trip easily with Sailora.',
+  title: 'Komodo Lombok Cruise | Explore Komodo & Lombok by Liveaboard',
+  description: 'Experience the best island adventure in Komodo and Lombok. Book your liveaboard and open trip easily with Komodo Lombok Cruise.',
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const openTrips = await prisma.trip.findMany({
+    where: { type: 'OPEN_TRIP', status: 'PUBLISHED' },
+    take: 4,
+    orderBy: { createdAt: 'desc' }
+  });
+
+  const boats = await prisma.boat.findMany({
+    take: 3,
+    orderBy: { createdAt: 'desc' }
+  });
+
+  const blogs = await prisma.blog.findMany({
+    where: { status: 'PUBLISHED' },
+    take: 3,
+    orderBy: { createdAt: 'desc' },
+    include: { category: true }
+  });
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* HERO SECTION */}
@@ -26,37 +49,7 @@ export default function HomePage() {
         </div>
 
         {/* Navbar (Transparent Overlay) */}
-        <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 md:px-12 md:py-6 text-white">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-               <span className="font-bold text-xl text-white">S</span>
-            </div>
-            <span className="font-bold text-xl tracking-wide">Sailora</span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="/" className="hover:text-blue-200 transition-colors">Home</Link>
-            <Link href="/trips" className="hover:text-blue-200 transition-colors">Trips</Link>
-            <Link href="/liveaboard" className="hover:text-blue-200 transition-colors">Liveaboard</Link>
-            <Link href="/blog" className="hover:text-blue-200 transition-colors">Blog</Link>
-            <Link href="/about" className="hover:text-blue-200 transition-colors">About Us</Link>
-            <Link href="/contact" className="hover:text-blue-200 transition-colors">Contact</Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button className="hidden md:flex items-center gap-2 text-sm font-medium hover:text-blue-200 transition-colors">
-              <Heart className="w-4 h-4" />
-              Wishlist
-            </button>
-            <Link href="/login" className="hidden md:flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded-full text-sm font-semibold hover:bg-slate-100 transition-colors">
-              <User className="w-4 h-4" />
-              Login
-            </Link>
-            <button className="md:hidden text-white">
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
-        </nav>
+        <Navbar transparent={true} />
 
         <div className="relative z-10 text-center px-4 mt-[-60px]">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-md leading-tight">
@@ -133,87 +126,162 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <TripCard 
-            image="https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop"
-            title="Athira Deluxe Cruise"
-            subtitle="4D3N Komodo"
-            rating={4.8}
-            reviews={120}
-            price="4.250.000"
-          />
-          <TripCard 
-            image="https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?q=80&w=800&auto=format&fit=crop"
-            title="Queen Maria"
-            subtitle="3D2N Komodo"
-            rating={4.9}
-            reviews={85}
-            price="3.750.000"
-          />
-          <TripCard 
-            image="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?q=80&w=800&auto=format&fit=crop"
-            title="Sea Dragon"
-            subtitle="4D3N Komodo"
-            rating={4.8}
-            reviews={110}
-            price="4.750.000"
-          />
-          <TripCard 
-            image="https://images.unsplash.com/photo-1570789210967-2cac24afeb00?q=80&w=800&auto=format&fit=crop"
-            title="Lombok Escape"
-            subtitle="3D2N Lombok"
-            rating={4.7}
-            reviews={64}
-            price="3.250.000"
-          />
+          {openTrips.length === 0 ? (
+            <p className="col-span-4 text-center text-slate-500">Belum ada paket Open Trip tersedia.</p>
+          ) : (
+            openTrips.map((trip) => (
+              <TripCard 
+                key={trip.id}
+                image={trip.featuredImage || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop"}
+                title={trip.title}
+                subtitle={`${trip.durationDays}D${trip.durationNights}N ${trip.destination}`}
+                rating={5.0} // Dummy for now
+                reviews={0} // Dummy for now
+                price={Number(trip.basePrice).toLocaleString('id-ID')}
+                slug={trip.slug}
+              />
+            ))
+          )}
         </div>
       </section>
+
+      {/* FEATURED LIVEABOARDS SECTION */}
+      <section className="bg-slate-50 py-24 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h2 className="text-3xl font-bold text-[#0A1F44] mb-2">Luxury Liveaboards</h2>
+              <p className="text-slate-500">Berlayar dengan gaya menggunakan armada phinisi pilihan kami.</p>
+            </div>
+            <Link href="/liveaboard" className="hidden md:block bg-white text-[#0A1F44] border border-slate-200 px-6 py-2 rounded-full font-semibold hover:bg-slate-50 transition-colors">
+              Explore Boats
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {boats.length === 0 ? (
+              <p className="col-span-3 text-center text-slate-500">Belum ada armada Phinisi tersedia.</p>
+            ) : (
+              boats.map((boat) => {
+                const specs = boat.specifications as any || {};
+                return (
+                  <LiveaboardCard 
+                    key={boat.id}
+                    image={boat.featuredImage || "https://images.unsplash.com/photo-1548574505-12caf0050b5b?q=80&w=800&auto=format&fit=crop"}
+                    title={boat.name}
+                    capacity={`${specs.capacity || 0} Guests`}
+                    type={specs.type || 'Phinisi'}
+                    rating={5.0} // Dummy
+                    reviews={0} // Dummy
+                    price={Number(specs.basePrice || 0).toLocaleString('id-ID')}
+                  />
+                );
+              })
+            )}
+          </div>
+          
+          <button className="w-full mt-8 md:hidden bg-white text-[#0A1F44] border border-slate-200 px-6 py-3 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
+            Explore All Boats
+          </button>
+        </div>
+      </section>
+
+      {/* WHY BOOK WITH US SECTION */}
+      <section className="bg-white py-24 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-[#0A1F44] mb-4">Mengapa Memilih Komodo Lombok Cruise?</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto">Kami berkomitmen memberikan pengalaman pemesanan liveaboard dan open trip terbaik, termudah, dan paling aman untuk petualangan Anda.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <FeatureCard 
+              icon={<ShieldCheck className="w-8 h-8 text-blue-600" />}
+              title="Best Price Guarantee"
+              description="Dapatkan harga terbaik untuk setiap perjalanan tanpa biaya tersembunyi."
+            />
+            <FeatureCard 
+              icon={<Zap className="w-8 h-8 text-amber-500" />}
+              title="Instant Confirmation"
+              description="Pemesanan cepat & mudah dengan konfirmasi instan di email Anda."
+            />
+            <FeatureCard 
+              icon={<Lock className="w-8 h-8 text-emerald-500" />}
+              title="Secure Payment"
+              description="Pembayaran aman terenkripsi dengan berbagai metode pilihan."
+            />
+            <FeatureCard 
+              icon={<Headphones className="w-8 h-8 text-purple-500" />}
+              title="24/7 Customer Support"
+              description="Tim support kami siap membantu Anda kapan pun dibutuhkan."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* LATEST BLOG / ARTICLES SECTION */}
+      <section className="bg-slate-50 py-24 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h2 className="text-3xl font-bold text-[#0A1F44] mb-2">Travel Guides & Tips</h2>
+              <p className="text-slate-500">Kumpulan cerita, panduan wisata, dan tips liburan ke Komodo & Lombok.</p>
+            </div>
+            <Link href="/blog" className="hidden md:flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 hover:underline">
+              <span>View All Articles</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {blogs.length === 0 ? (
+              <p className="col-span-3 text-center text-slate-500">Belum ada artikel yang diterbitkan.</p>
+            ) : (
+              blogs.map((blog) => {
+                // simple strip html for excerpt
+                const excerpt = blog.content.replace(/<[^>]*>?/gm, '').substring(0, 120) + '...';
+                
+                return (
+                  <Link key={blog.id} href={`/blog/${blog.slug}`} className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 flex flex-col">
+                    <div className="relative aspect-video w-full overflow-hidden bg-slate-200">
+                      <Image 
+                        src={blog.thumbnail || "https://images.unsplash.com/photo-1512100356356-de1b84283e18?q=80&w=800&auto=format&fit=crop"}
+                        alt={blog.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">{blog.category?.name || 'Artikel'}</div>
+                      <h3 className="font-bold text-lg text-slate-900 leading-tight mb-3 group-hover:text-blue-600 transition-colors">{blog.title}</h3>
+                      <p className="text-sm text-slate-500 line-clamp-2 mb-4">{excerpt}</p>
+                      <div className="mt-auto text-xs text-slate-400 font-medium">{new Date(blog.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric'})}</div>
+                    </div>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+
+          <button className="w-full mt-8 md:hidden bg-white text-[#0A1F44] border border-slate-200 px-6 py-3 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
+            View All Articles
+          </button>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <Footer />
     </div>
   );
 }
 
-function TripCard({ image, title, subtitle, rating, reviews, price }: {
-  image: string;
-  title: string;
-  subtitle: string;
-  rating: number;
-  reviews: number;
-  price: string;
-}) {
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-200">
-        <Image 
-          src={image}
-          alt={title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full text-slate-400 hover:text-red-500 hover:bg-white transition-colors">
-          <Heart className="w-5 h-5" />
-        </button>
+    <div className="flex flex-col items-center text-center p-6 bg-[#F8FAFC] rounded-2xl border border-slate-100 hover:shadow-md transition-shadow">
+      <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6">
+        {icon}
       </div>
-      <div className="p-5 flex flex-col flex-1">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 className="font-bold text-lg text-slate-900 leading-tight mb-1">{title}</h3>
-            <p className="text-sm text-slate-500 font-medium">{subtitle}</p>
-          </div>
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-md">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="text-sm font-bold text-amber-600">{rating}</span>
-            </div>
-            <span className="text-xs text-slate-400 mt-1">({reviews})</span>
-          </div>
-        </div>
-        
-        <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-          <div>
-            <span className="text-xs text-slate-500 font-medium block">From</span>
-            <span className="font-bold text-lg text-[#0A1F44]">Rp {price}</span>
-          </div>
-        </div>
-      </div>
+      <h3 className="font-bold text-lg text-slate-900 mb-3">{title}</h3>
+      <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
     </div>
   );
 }

@@ -169,6 +169,7 @@ model Trip {
   durationNights Int
   description   String    @db.Text
   basePrice     Decimal   @db.Decimal(10, 2)
+  pricingOptions Json?    // Array of { name: string, price: number }
   featuredImage String?
   gallery       Json?     
   status        PublishStatus @default(DRAFT)
@@ -245,7 +246,10 @@ model TripSchedule {
 model Booking {
   id              String    @id @default(cuid())
   bookingCode     String    @unique 
-  userId          String
+  userId          String?
+  guestName       String?
+  guestEmail      String?
+  guestPhone      String?
   tripScheduleId  String
   voucherId       String?
   
@@ -261,7 +265,7 @@ model Booking {
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
 
-  user            User      @relation(fields: [userId], references: [id])
+  user            User?     @relation(fields: [userId], references: [id])
   schedule        TripSchedule @relation(fields: [tripScheduleId], references: [id])
   voucher         Voucher?  @relation(fields: [voucherId], references: [id])
   
