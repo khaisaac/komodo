@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Resend instance will be created dynamically to prevent build errors
 
 function generateBookingCode() {
   return 'KLC-' + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -84,6 +84,7 @@ export async function POST(request: Request) {
     // 2. Send Email Notification via Resend
     // Skip if no API Key is set to avoid crashing the demo locally
     if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
       await resend.emails.send({
         from: 'Komodo Lombok Cruise <noreply@komodolombokcruise.com>', // You might need a verified domain in Resend
         to: guestEmail,
