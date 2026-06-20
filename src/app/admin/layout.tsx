@@ -2,6 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import { LayoutDashboard, Map, Ship, CalendarCheck, Settings, LogOut, FileText } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Admin Dashboard | Komodo Lombok Cruise',
 };
