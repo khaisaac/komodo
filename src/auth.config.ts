@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs"
 import { prisma } from "./lib/prisma"
 
 export const authConfig = {
+  trustHost: true,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
