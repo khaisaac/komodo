@@ -14,7 +14,6 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  try {
     const openTrips = await prisma.trip.findMany({
       where: { type: 'OPEN_TRIP', status: 'PUBLISHED' },
       take: 4,
@@ -273,15 +272,6 @@ export default async function HomePage() {
       <Footer />
     </div>
   );
-  } catch (err: any) {
-    return (
-      <div className="p-10 bg-white">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">CRITICAL ERROR CAUGHT:</h1>
-        <p className="font-mono text-sm bg-red-50 p-4 rounded text-red-900 break-words whitespace-pre-wrap">{err.message}</p>
-        <p className="font-mono text-xs bg-slate-100 p-4 rounded text-slate-800 mt-4 break-words whitespace-pre-wrap">{err.stack}</p>
-      </div>
-    );
-  }
 }
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
