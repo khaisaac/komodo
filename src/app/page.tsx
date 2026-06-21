@@ -14,23 +14,31 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-    const openTrips = await prisma.trip.findMany({
+  let openTrips: any[] = [];
+  let boats: any[] = [];
+  let blogs: any[] = [];
+
+  try {
+    openTrips = await prisma.trip.findMany({
       where: { type: 'OPEN_TRIP', status: 'PUBLISHED' },
       take: 4,
       orderBy: { createdAt: 'desc' }
     });
 
-    const boats = await prisma.boat.findMany({
+    boats = await prisma.boat.findMany({
       take: 3,
       orderBy: { createdAt: 'desc' }
     });
 
-    const blogs = await prisma.blog.findMany({
+    blogs = await prisma.blog.findMany({
       where: { status: 'PUBLISHED' },
       take: 3,
       orderBy: { createdAt: 'desc' },
       include: { category: true }
     });
+  } catch (err) {
+    console.error("Database connection error on homepage:", err);
+  }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
