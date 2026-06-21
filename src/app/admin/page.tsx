@@ -3,11 +3,19 @@ import { prisma } from '@/lib/prisma';
 import { Map, Ship, CalendarCheck, Users } from 'lucide-react';
 
 export default async function AdminDashboardPage() {
-  // Fetch summary counts from database
-  const totalTrips = await prisma.trip.count();
-  const totalBoats = await prisma.boat.count();
-  const totalBookings = await prisma.booking.count();
-  const totalUsers = await prisma.user.count();
+  let totalTrips = 0;
+  let totalBoats = 0;
+  let totalBookings = 0;
+  let totalUsers = 0;
+
+  try {
+    totalTrips = await prisma.trip.count();
+    totalBoats = await prisma.boat.count();
+    totalBookings = await prisma.booking.count();
+    totalUsers = await prisma.user.count();
+  } catch (err) {
+    console.error("DB connection error on admin page:", err);
+  }
 
   return (
     <div>
