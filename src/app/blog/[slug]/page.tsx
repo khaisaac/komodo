@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { notFound } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 import { ArrowLeft, Calendar, User } from 'lucide-react';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {

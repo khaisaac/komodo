@@ -6,6 +6,8 @@ import TripCard from '@/components/TripCard';
 import FilterSidebar from '@/components/FilterSidebar';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Open Trips | Komodo Lombok Cruise',
   description: 'Find the best Open Trip packages to Komodo, Lombok, and other destinations.',

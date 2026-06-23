@@ -8,6 +8,8 @@ import { MapPin, Clock, CheckCircle, XCircle, Star } from 'lucide-react';
 import BookingForm from './BookingForm';
 import GalleryGrid from '@/components/GalleryGrid';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const trip = await prisma.trip.findUnique({ where: { slug } });

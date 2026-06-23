@@ -6,6 +6,8 @@ import LiveaboardCard from '@/components/LiveaboardCard';
 import LiveaboardFilterSidebar from '@/components/LiveaboardFilterSidebar';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Luxury Liveaboards | Komodo Lombok Cruise',
   description: 'Rent a premium phinisi boat for your sailing adventure in Komodo, Raja Ampat, and other destinations.',

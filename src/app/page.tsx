@@ -9,6 +9,8 @@ import Footer from '@/components/Footer';
 import SearchWidget from '@/components/SearchWidget';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Komodo Lombok Cruise | Explore Komodo & Lombok by Liveaboard',
   description: 'Experience the best island adventure in Komodo and Lombok. Book your liveaboard and open trip easily with Komodo Lombok Cruise.',

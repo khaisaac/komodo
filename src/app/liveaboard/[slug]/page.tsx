@@ -7,6 +7,8 @@ import { notFound } from 'next/navigation';
 import { Users, MapPin, CheckCircle, Ship, Star } from 'lucide-react';
 import GalleryGrid from '@/components/GalleryGrid';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const boat = await prisma.boat.findUnique({ where: { slug } });
