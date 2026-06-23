@@ -1,6 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Map, Ship, CalendarCheck, Settings, LogOut, FileText } from 'lucide-react';
+import { LayoutDashboard, Map, Ship, CalendarCheck, Settings, LogOut, FileText, MapPin, Tag, Star } from 'lucide-react';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import { logOut } from '@/app/actions/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +11,12 @@ export const metadata = {
   title: 'Admin Dashboard | Komodo Lombok Cruise',
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect('/login');
+  }
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* SIDEBAR */}
@@ -23,6 +31,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <LayoutDashboard className="w-5 h-5" />
             <span className="font-medium">Dashboard</span>
           </Link>
+          <Link href="/admin/destinations" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-colors">
+            <MapPin className="w-5 h-5" />
+            <span className="font-medium">Destinations</span>
+          </Link>
           <Link href="/admin/trips" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-colors">
             <Map className="w-5 h-5" />
             <span className="font-medium">Open Trips</span>
@@ -35,17 +47,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <CalendarCheck className="w-5 h-5" />
             <span className="font-medium">Bookings</span>
           </Link>
+          <Link href="/admin/vouchers" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-colors">
+            <Tag className="w-5 h-5" />
+            <span className="font-medium">Vouchers</span>
+          </Link>
           <Link href="/admin/blog" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-colors">
             <FileText className="w-5 h-5" />
             <span className="font-medium">Blog & Articles</span>
           </Link>
+
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 space-y-2">
           <Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-colors">
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Back to Website</span>
           </Link>
+          <form action={logOut}>
+            <button type="submit" className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout Admin</span>
+            </button>
+          </form>
         </div>
       </aside>
 

@@ -6,7 +6,7 @@ import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
 
 export const metadata = {
   title: 'Contact Us | Komodo Lombok Cruise',
-  description: 'Hubungi tim Komodo Lombok Cruise untuk konsultasi perjalanan, pemesanan kustom, atau pertanyaan lainnya.',
+  description: 'Contact the Komodo Lombok Cruise team for travel consultation, custom bookings, or other inquiries.',
 };
 
 export default function ContactPage() {
@@ -25,9 +25,9 @@ export default function ContactPage() {
           />
         </div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">Hubungi Kami</h1>
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">Contact Us</h1>
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Tim kami siap membantu Anda merencanakan perjalanan bahari impian. Jangan ragu untuk bertanya!
+            Our team is ready to help you plan your dream nautical journey. Don't hesitate to ask!
           </p>
         </div>
       </div>
@@ -42,9 +42,9 @@ export default function ContactPage() {
             <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-white opacity-5"></div>
             
             <div className="relative z-10">
-              <h2 className="text-2xl font-bold mb-8">Informasi Kontak</h2>
+              <h2 className="text-2xl font-bold mb-8">Contact Information</h2>
               <p className="text-slate-300 mb-12">
-                Punya pertanyaan seputar open trip, charter kapal, atau kerja sama bisnis? Segera hubungi kami.
+                Have questions about open trips, boat charters, or business partnerships? Contact us immediately.
               </p>
 
               <div className="space-y-8">
@@ -53,7 +53,7 @@ export default function ContactPage() {
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Alamat Kantor</h4>
+                    <h4 className="font-bold mb-1">Office Address</h4>
                     <p className="text-sm text-slate-300 leading-relaxed">Jl. Soekarno Hatta, Labuan Bajo, Manggarai Barat, Nusa Tenggara Timur, Indonesia 86554</p>
                   </div>
                 </div>
@@ -63,7 +63,7 @@ export default function ContactPage() {
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Telepon & WhatsApp</h4>
+                    <h4 className="font-bold mb-1">Phone & WhatsApp</h4>
                     <p className="text-sm text-slate-300">+62 812 3456 7890</p>
                   </div>
                 </div>
@@ -83,8 +83,8 @@ export default function ContactPage() {
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Jam Operasional</h4>
-                    <p className="text-sm text-slate-300">Senin - Minggu: 08:00 - 20:00 WITA</p>
+                    <h4 className="font-bold mb-1">Operational Hours</h4>
+                    <p className="text-sm text-slate-300">Monday - Sunday: 08:00 - 20:00 WITA</p>
                   </div>
                 </div>
               </div>
@@ -106,13 +106,13 @@ export default function ContactPage() {
 
           {/* RIGHT: CONTACT FORM */}
           <div className="lg:w-3/5 p-10 lg:p-14">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Kirim Pesan</h2>
-            <p className="text-slate-500 mb-8">Tuliskan pesan Anda di bawah ini dan tim kami akan merespons dalam waktu 1x24 jam.</p>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Send a Message</h2>
+            <p className="text-slate-500 mb-8">Write your message below and our team will respond within 24 hours.</p>
 
             <form className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
                   <input 
                     type="text" 
                     placeholder="John Doe"
@@ -120,7 +120,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Alamat Email</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
                   <input 
                     type="email" 
                     placeholder="john@example.com"
@@ -131,7 +131,7 @@ export default function ContactPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Nomor Telepon / WhatsApp</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Phone / WhatsApp Number</label>
                   <input 
                     type="tel" 
                     placeholder="+62 812..."
@@ -139,21 +139,21 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Tujuan / Pertanyaan (Subjek)</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Purpose / Question (Subject)</label>
                   <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-colors cursor-pointer text-slate-700">
-                    <option>Pemesanan Open Trip</option>
-                    <option>Charter Liveaboard (Private)</option>
-                    <option>Kerja Sama Bisnis</option>
-                    <option>Pertanyaan Lainnya</option>
+                    <option>Open Trip Booking</option>
+                    <option>Liveaboard Charter (Private)</option>
+                    <option>Business Partnership</option>
+                    <option>Other Inquiries</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Pesan Anda</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Your Message</label>
                 <textarea 
                   rows={5}
-                  placeholder="Ceritakan detail rencana perjalanan atau pertanyaan Anda..."
+                  placeholder="Tell us the details of your travel plans or your questions..."
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-colors resize-none"
                 ></textarea>
               </div>
@@ -161,7 +161,7 @@ export default function ContactPage() {
               <div className="pt-2">
                 <button type="button" className="w-full sm:w-auto bg-[#0A1F44] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#112a5c] transition-colors shadow-lg flex items-center justify-center gap-2">
                   <Send className="w-5 h-5" />
-                  <span>Kirim Pesan Sekarang</span>
+                  <span>Send Message Now</span>
                 </button>
               </div>
             </form>
@@ -176,8 +176,8 @@ export default function ContactPage() {
               <MessageSquare className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-green-800 mb-1">Butuh Respon Cepat?</h3>
-              <p className="text-green-700">Ngobrol langsung dengan tim support kami via WhatsApp.</p>
+              <h3 className="text-xl font-bold text-green-800 mb-1">Need a Quick Response?</h3>
+              <p className="text-green-700">Chat directly with our support team via WhatsApp.</p>
             </div>
           </div>
           <button className="bg-green-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg whitespace-nowrap">

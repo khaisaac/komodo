@@ -19,15 +19,16 @@ export async function processCheckout(formData: FormData) {
   const guestName = formData.get('guestName') as string;
   const guestEmail = formData.get('guestEmail') as string;
   const guestPhone = formData.get('guestPhone') as string;
+  
+  const paymentType = (formData.get('paymentType') as 'FULL' | 'DP_30') || 'FULL';
+  const voucherId = formData.get('voucherId') as string | null;
 
-  // 1. Ensure a TripSchedule exists to attach the Booking to. 
-  // For open trips without specific dates in this simplified UI, we use a generic "Open Date" schedule.
+  // 1. Ensure a TripSchedule exists
   let schedule = await prisma.tripSchedule.findFirst({
     where: { tripId }
   });
 
   if (!schedule) {
-    // Auto-create a dummy schedule spanning next year
     schedule = await prisma.tripSchedule.create({
       data: {
         tripId,
@@ -39,7 +40,35 @@ export async function processCheckout(formData: FormData) {
     });
   }
 
-  // 2. Create Booking in Database (Status: PENDING)
+  // 2. Validate Voucher and Calculate Secure Discount
+  let discountAmount = 0;
+  if (voucherId) {
+    const voucher = await prisma.voucher.findUnique({ where: { id: voucherId } });
+    if (voucher && voucher.isActive) {
+      const now = new Date();
+      if (now >= voucher.validFrom && now <= voucher.validTo) {
+        if (!voucher.usageLimit || voucher.usedCount < voucher.usageLimit) {
+          if (voucher.discountType === 'PERCENTAGE') {
+            discountAmount = (selectedPackagePrice * Number(voucher.discountValue)) / 100;
+          } else {
+            discountAmount = Number(voucher.discountValue);
+          }
+          if (discountAmount > selectedPackagePrice) discountAmount = selectedPackagePrice;
+          
+          // Increment usedCount
+          await prisma.voucher.update({
+            where: { id: voucher.id },
+            data: { usedCount: { increment: 1 } }
+          });
+        }
+      }
+    }
+  }
+
+  const grandTotal = selectedPackagePrice - discountAmount;
+  const amountToPayToday = paymentType === 'DP_30' ? grandTotal * 0.3 : grandTotal;
+
+  // 3. Create Booking in Database (Status: PENDING)
   const bookingCode = `KLC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
   
   const booking = await prisma.booking.create({
@@ -49,14 +78,17 @@ export async function processCheckout(formData: FormData) {
       guestEmail,
       guestPhone,
       tripScheduleId: schedule.id,
+      voucherId: voucherId || null,
       subtotal: selectedPackagePrice,
-      grandTotal: selectedPackagePrice,
+      discountAmount: discountAmount,
+      grandTotal: grandTotal,
+      paymentType: paymentType,
       status: 'PENDING',
       specialRequest: `Package: ${selectedPackageName}`,
     }
   });
 
-  // 3. Connect to DOKU Payment Gateway (Production)
+  // 4. Connect to DOKU Payment Gateway (Production)
   const DOKU_CLIENT_ID = process.env.DOKU_CLIENT_ID || '';
   const DOKU_SECRET_KEY = process.env.DOKU_SECRET_KEY || '';
   
@@ -74,13 +106,13 @@ export async function processCheckout(formData: FormData) {
   
   const payload = {
     order: {
-      amount: selectedPackagePrice,
+      amount: amountToPayToday,
       invoice_number: bookingCode,
       callback_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/doku/callback`,
       line_items: [
         {
-          name: `${tripTitle} - ${selectedPackageName}`,
-          price: selectedPackagePrice,
+          name: `${tripTitle} - ${selectedPackageName} (${paymentType === 'DP_30' ? 'DP 30%' : 'Lunas'})`,
+          price: amountToPayToday,
           quantity: 1
         }
       ]

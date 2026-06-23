@@ -20,19 +20,25 @@ export default async function EditTripPage({ params }: { params: Promise<{ id: s
     parsedPricingOptions = trip.pricingOptions as any;
   }
 
+  const destinations = await prisma.destination.findMany({
+    orderBy: { name: 'asc' }
+  });
+
   return (
     <EditTripForm 
       trip={{
         id: trip.id,
         title: trip.title,
-        destination: trip.destination,
+        destinationId: trip.destinationId || '',
         durationDays: trip.durationDays,
         durationNights: trip.durationNights,
         basePrice: Number(trip.basePrice),
         featuredImage: trip.featuredImage || '',
         description: trip.description,
+        gallery: trip.gallery,
       }} 
       initialPricingOptions={parsedPricingOptions} 
+      destinations={destinations}
     />
   );
 }

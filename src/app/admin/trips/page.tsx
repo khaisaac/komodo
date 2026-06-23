@@ -7,7 +7,8 @@ import { deleteTrip } from '@/app/actions/trip';
 export default async function AdminTripsPage() {
   const trips = await prisma.trip.findMany({
     where: { type: 'OPEN_TRIP' },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    include: { destination: true }
   });
 
   return (
@@ -49,7 +50,7 @@ export default async function AdminTripsPage() {
                 trips.map((trip) => (
                   <tr key={trip.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="p-4 font-medium text-slate-900">{trip.title}</td>
-                    <td className="p-4 text-slate-600">{trip.destination}</td>
+                    <td className="p-4 text-slate-600">{trip.destination?.name || '-'}</td>
                     <td className="p-4 text-slate-600">{trip.durationDays}H {trip.durationNights}M</td>
                     <td className="p-4 text-slate-600">Rp {Number(trip.basePrice).toLocaleString('id-ID')}</td>
                     <td className="p-4 text-right">

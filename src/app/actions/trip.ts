@@ -12,7 +12,10 @@ export async function createTrip(formData: FormData) {
   const basePrice = parseFloat(formData.get('basePrice') as string);
   const description = formData.get('description') as string;
   const featuredImage = formData.get('featuredImage') as string;
+  const galleryStr = formData.get('gallery') as string;
   const pricingOptionsStr = formData.get('pricingOptionsStr') as string;
+  const rating = parseFloat(formData.get('rating') as string) || 5.0;
+  const reviewCount = parseInt(formData.get('reviewCount') as string) || 0;
   
   let pricingOptions = null;
   if (pricingOptionsStr) {
@@ -36,13 +39,16 @@ export async function createTrip(formData: FormData) {
       title,
       slug,
       type: 'OPEN_TRIP',
-      destination,
+      destinationId: destination,
       durationDays,
       durationNights,
       description,
       basePrice,
       pricingOptions: pricingOptions || undefined,
       featuredImage: featuredImage || null,
+      gallery: galleryStr ? JSON.parse(galleryStr) : null,
+      rating,
+      reviewCount,
       status: 'PUBLISHED',
     }
   });
@@ -71,7 +77,10 @@ export async function updateTrip(id: string, formData: FormData) {
   const basePrice = parseFloat(formData.get('basePrice') as string);
   const description = formData.get('description') as string;
   const featuredImage = formData.get('featuredImage') as string;
+  const galleryStr = formData.get('gallery') as string;
   const pricingOptionsStr = formData.get('pricingOptionsStr') as string;
+  const rating = parseFloat(formData.get('rating') as string) || 5.0;
+  const reviewCount = parseInt(formData.get('reviewCount') as string) || 0;
   
   let pricingOptions = null;
   if (pricingOptionsStr) {
@@ -94,13 +103,16 @@ export async function updateTrip(id: string, formData: FormData) {
     data: {
       title,
       slug,
-      destination,
+      destinationId: destination,
       durationDays,
       durationNights,
       description,
       basePrice,
       pricingOptions: pricingOptions || undefined,
       featuredImage: featuredImage || null,
+      gallery: galleryStr ? JSON.parse(galleryStr) : undefined,
+      rating,
+      reviewCount,
     }
   });
 

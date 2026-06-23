@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Users, Star } from 'lucide-react';
 
 interface LiveaboardCardProps {
@@ -10,11 +11,12 @@ interface LiveaboardCardProps {
   rating: number;
   reviews: number;
   price: string;
+  slug: string;
 }
 
-export default function LiveaboardCard({ image, title, capacity, type, rating, reviews, price }: LiveaboardCardProps) {
+export default function LiveaboardCard({ image, title, capacity, type, rating, reviews, price, slug }: LiveaboardCardProps) {
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col">
+    <Link href={`/liveaboard/${slug}`} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col cursor-pointer block">
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-200">
         <Image 
           src={image}
@@ -50,6 +52,6 @@ export default function LiveaboardCard({ image, title, capacity, type, rating, r
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

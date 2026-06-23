@@ -6,7 +6,8 @@ import { deleteBoat } from '@/app/actions/boat';
 
 export default async function AdminBoatsPage() {
   const boats = await prisma.boat.findMany({
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    include: { destination: true }
   });
 
   return (
@@ -31,6 +32,7 @@ export default async function AdminBoatsPage() {
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
                 <th className="p-4 font-semibold text-slate-600">Nama Kapal</th>
+                <th className="p-4 font-semibold text-slate-600">Destinasi</th>
                 <th className="p-4 font-semibold text-slate-600">Tipe</th>
                 <th className="p-4 font-semibold text-slate-600">Kapasitas</th>
                 <th className="p-4 font-semibold text-slate-600">Harga / Malam</th>
@@ -40,7 +42,7 @@ export default async function AdminBoatsPage() {
             <tbody>
               {boats.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-slate-500">
+                  <td colSpan={6} className="p-8 text-center text-slate-500">
                     Belum ada armada kapal. Silakan tambah baru.
                   </td>
                 </tr>
@@ -50,6 +52,7 @@ export default async function AdminBoatsPage() {
                   return (
                     <tr key={boat.id} className="border-b border-slate-100 hover:bg-slate-50">
                       <td className="p-4 font-medium text-slate-900">{boat.name}</td>
+                      <td className="p-4 text-slate-600">{boat.destination?.name || '-'}</td>
                       <td className="p-4 text-slate-600">{specs.type || '-'}</td>
                       <td className="p-4 text-slate-600">{specs.capacity || '-'} Pax</td>
                       <td className="p-4 text-slate-600">Rp {Number(specs.basePrice || 0).toLocaleString('id-ID')}</td>

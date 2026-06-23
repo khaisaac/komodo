@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { MapPin } from 'lucide-react';
+import { MapPin, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -14,7 +14,7 @@ export default function Footer() {
             <span className="font-bold text-2xl tracking-wide text-white">Komodo Lombok Cruise</span>
           </div>
           <p className="text-sm leading-relaxed mb-6">
-            Platform pemesanan Liveaboard dan Open Trip terbaik di Indonesia. Temukan petualangan impian Anda di Komodo, Lombok, dan destinasi menakjubkan lainnya.
+            The best Liveaboard and Open Trip booking platform in Indonesia. Discover your dream adventure in Komodo, Lombok, and other amazing destinations.
           </p>
         </div>
         <div>
@@ -41,6 +41,14 @@ export default function Footer() {
             <li className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-slate-400 shrink-0" />
               <span>Labuan Bajo, Manggarai Barat, Nusa Tenggara Timur, Indonesia</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-slate-400 shrink-0" />
+              <span>081916067159 | Admin 1</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-slate-400 shrink-0" />
+              <span>087765550004 | Admin 2</span>
             </li>
           </ul>
         </div>

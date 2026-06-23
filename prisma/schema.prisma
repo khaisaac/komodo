@@ -121,11 +121,14 @@ model Boat {
   id            String    @id @default(cuid())
   name          String
   slug          String    @unique
+  destinationId String?
   description   String?   @db.Text
   specifications Json?    // e.g., length, width, engine, speed
   amenities     Json?     // Array of strings (AC, Sun Deck, etc.)
-  featuredImage String?
+  featuredImage String?   @db.LongText
   gallery       Json?     // Array of image URLs
+  rating        Float?    @default(5.0)
+  reviewCount   Int?      @default(0)
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -133,6 +136,26 @@ model Boat {
 
   cabins        Cabin[]
   schedules     TripSchedule[]
+  destination   Destination? @relation(fields: [destinationId], references: [id])
+
+  @@index([slug])
+  @@index([deletedAt])
+  @@index([destinationId])
+}
+
+model Destination {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String?   @db.Text
+  image         String?   @db.LongText
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  trips         Trip[]
+  boats         Boat[]
 
   @@index([slug])
   @@index([deletedAt])
@@ -164,27 +187,30 @@ model Trip {
   title         String
   slug          String    @unique
   type          TripType
-  destination   String
+  destinationId String?
   durationDays  Int
   durationNights Int
   description   String    @db.Text
   basePrice     Decimal   @db.Decimal(10, 2)
   pricingOptions Json?    // Array of { name: string, price: number }
-  featuredImage String?
+  featuredImage String?   @db.LongText
   gallery       Json?     
+  rating        Float?    @default(5.0)
+  reviewCount   Int?      @default(0)
   status        PublishStatus @default(DRAFT)
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
 
+  destination   Destination? @relation(fields: [destinationId], references: [id])
   itineraries   TripItinerary[]
   facilities    TripFacility[]
   schedules     TripSchedule[]
   reviews       Review[]
 
   @@index([slug])
-  @@index([destination])
+  @@index([destinationId])
   @@index([status])
   @@index([deletedAt])
 }
@@ -358,7 +384,8 @@ model Voucher {
 
 model Review {
   id            String    @id @default(cuid())
-  userId        String
+  userId        String?
+  reviewerName  String?
   tripId        String
   rating        Int       
   comment       String?   @db.Text
@@ -367,7 +394,7 @@ model Review {
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
 
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   trip          Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -396,7 +423,7 @@ model Blog {
   title         String
   slug          String    @unique
   content       String    @db.Text
-  thumbnail     String?
+  thumbnail     String?   @db.LongText
   authorId      String
   categoryId    String
   status        PublishStatus @default(DRAFT)

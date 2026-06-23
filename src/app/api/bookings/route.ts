@@ -41,7 +41,6 @@ export async function POST(request: Request) {
           title: 'Dummy Trip',
           slug: 'dummy-trip',
           type: 'OPEN_TRIP',
-          destination: 'Komodo',
           durationDays: 3,
           durationNights: 2,
           description: 'This is a dummy trip for booking demo.',

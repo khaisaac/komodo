@@ -4,8 +4,9 @@ import { prisma } from '@/lib/prisma';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { notFound } from 'next/navigation';
-import { Clock, MapPin, CheckCircle } from 'lucide-react';
+import { MapPin, Clock, CheckCircle, Star } from 'lucide-react';
 import BookingForm from './BookingForm';
+import GalleryGrid from '@/components/GalleryGrid';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -19,6 +20,7 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
   
   const trip = await prisma.trip.findUnique({
     where: { slug },
+    include: { destination: true }
   });
 
   if (!trip) {
@@ -33,6 +35,8 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
     // Fallback to basePrice if no options provided
     pricingOptions = [{ name: 'Standard Package', price: Number(trip.basePrice) }];
   }
+
+  const galleryImages = trip.gallery ? (trip.gallery as string[]) : [];
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
@@ -56,11 +60,16 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
           <div className="flex flex-wrap gap-6 text-sm md:text-base text-slate-200">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5" />
-              <span>{trip.destination}</span>
+              <span>{trip.destination?.name || 'Unknown'}</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
-              <span>{trip.durationDays} Hari {trip.durationNights} Malam</span>
+              <span>{trip.durationDays} Days {trip.durationNights} Nights</span>
+            </div>
+            <div className="flex items-center gap-1 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/30 backdrop-blur-sm">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-bold text-amber-400">{trip.rating ?? 5.0}</span>
+              <span className="text-white/80 text-xs ml-1">({trip.reviewCount ?? 0} reviews)</span>
             </div>
           </div>
         </div>
@@ -69,8 +78,10 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-12 flex flex-col lg:flex-row gap-8">
         {/* LEFT COLUMN: DETAILS */}
         <div className="flex-1 lg:w-2/3">
+          {galleryImages.length > 0 && <GalleryGrid images={galleryImages} />}
+          
           <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Deskripsi Perjalanan</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Trip Description</h2>
             <div className="prose prose-slate max-w-none text-slate-600">
               {trip.description.split('\n').map((paragraph, idx) => (
                 <p key={idx} className="mb-4">{paragraph}</p>
@@ -80,9 +91,9 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
 
           {/* Just dummy inclusions for UI */}
           <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Fasilitas Termasuk</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Inclusions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {['Transportasi Kapal (Cabin/AC)', 'Makan 3x Sehari', 'Peralatan Snorkeling', 'Guide Lokal Berpengalaman', 'Dokumentasi Premium', 'Air Mineral, Kopi, Teh'].map((item, idx) => (
+              {['Boat Transportation (Cabin/AC)', '3x Meals a Day', 'Snorkeling Equipment', 'Experienced Local Guide', 'Premium Documentation', 'Mineral Water, Coffee, Tea'].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                   <span className="text-slate-700">{item}</span>

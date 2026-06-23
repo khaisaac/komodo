@@ -24,14 +24,14 @@ export default async function BlogIndexPage() {
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-[#0A1F44] mb-4">Travel Guides & Tips</h1>
           <p className="text-lg text-slate-500 max-w-2xl">
-            Temukan panduan, tips, dan cerita inspiratif seputar perjalanan wisata di Taman Nasional Komodo dan Lombok.
+            Discover guides, tips, and inspiring stories about traveling in Komodo National Park and Lombok.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogs.length === 0 ? (
             <div className="col-span-full py-12 text-center text-slate-500 bg-white rounded-2xl border border-slate-100">
-              Belum ada artikel yang diterbitkan saat ini.
+              No articles published yet.
             </div>
           ) : (
             blogs.map((blog) => {
@@ -48,11 +48,11 @@ export default async function BlogIndexPage() {
                     />
                   </div>
                   <div className="p-6 flex flex-col flex-1">
-                    <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">{blog.category?.name || 'Artikel'}</div>
+                    <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">{blog.category?.name || 'Article'}</div>
                     <h3 className="font-bold text-xl text-slate-900 leading-tight mb-3 group-hover:text-blue-600 transition-colors">{blog.title}</h3>
                     <p className="text-sm text-slate-500 line-clamp-3 mb-4">{excerpt}</p>
                     <div className="mt-auto pt-4 border-t border-slate-100 text-xs text-slate-400 font-medium">
-                      {new Date(blog.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric'})}
+                      {new Date(blog.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric'})}
                     </div>
                   </div>
                 </Link>

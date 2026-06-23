@@ -2,32 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { updateTrip } from '@/app/actions/trip';
+import { createTrip } from '@/app/actions/trip';
 import { ArrowLeft, Save, Loader2, Plus, Trash2 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import MultiImageUpload from '@/components/MultiImageUpload';
 
-interface EditTripFormProps {
-  trip: {
-    id: string;
-    title: string;
-    destinationId: string;
-    durationDays: number;
-    durationNights: number;
-    basePrice: number;
-    featuredImage: string;
-    description: string;
-    gallery?: any;
-    rating?: number;
-    reviewCount?: number;
-  };
-  initialPricingOptions: any[];
-  destinations: any[];
-}
-
-export default function EditTripForm({ trip, initialPricingOptions, destinations }: EditTripFormProps) {
+export default function CreateTripForm({ destinations }: { destinations: any[] }) {
   const [loading, setLoading] = useState(false);
-  const [pricingOptions, setPricingOptions] = useState(initialPricingOptions);
+  const [pricingOptions, setPricingOptions] = useState([{ name: '', price: '' }]);
 
   const addPricingOption = () => setPricingOptions([...pricingOptions, { name: '', price: '' }]);
   const removePricingOption = (index: number) => {
@@ -49,8 +31,8 @@ export default function EditTripForm({ trip, initialPricingOptions, destinations
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Edit Open Trip</h1>
-          <p className="text-slate-500 mt-1">Perbarui data paket Open Trip Anda.</p>
+          <h1 className="text-3xl font-bold text-slate-900">Tambah Open Trip</h1>
+          <p className="text-slate-500 mt-1">Buat paket Open Trip baru untuk ditampilkan di website.</p>
         </div>
       </div>
 
@@ -58,18 +40,18 @@ export default function EditTripForm({ trip, initialPricingOptions, destinations
         <form 
           action={async (formData) => {
             setLoading(true);
-            await updateTrip(trip.id, formData);
+            await createTrip(formData);
           }} 
           className="space-y-6"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Judul Paket *</label>
-              <input type="text" name="title" defaultValue={trip.title} required placeholder="Misal: Sailing Komodo Premium 3D2N" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="text" name="title" required placeholder="Misal: Sailing Komodo Premium 3D2N" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Destinasi Utama *</label>
-              <select name="destination" defaultValue={trip.destinationId} required className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500 appearance-none">
+              <select name="destination" required className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500 appearance-none">
                 <option value="">Pilih Destinasi...</option>
                 {destinations.map(d => (
                   <option key={d.id} value={d.id}>{d.name}</option>
@@ -81,39 +63,38 @@ export default function EditTripForm({ trip, initialPricingOptions, destinations
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Durasi Hari *</label>
-              <input type="number" name="durationDays" defaultValue={trip.durationDays} required min="1" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="number" name="durationDays" required min="1" defaultValue="3" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Durasi Malam *</label>
-              <input type="number" name="durationNights" defaultValue={trip.durationNights} required min="0" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="number" name="durationNights" required min="0" defaultValue="2" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Harga Mulai Dari (Rp) *</label>
-              <input type="number" name="basePrice" defaultValue={trip.basePrice} required min="0" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="number" name="basePrice" required min="0" placeholder="2500000" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <ImageUpload name="featuredImage" label="Gambar Utama" initialImage={trip.featuredImage} />
+              <ImageUpload name="featuredImage" label="Gambar Utama" />
             </div>
             <div>
-              <MultiImageUpload name="gallery" label="Foto Galeri (Maksimal 5)" maxImages={5} initialImages={trip.gallery ? (trip.gallery as string[]) : []} />
+              <MultiImageUpload name="gallery" label="Foto Galeri (Maksimal 5)" maxImages={5} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Rating Paket (1.0 - 5.0)</label>
-              <input type="number" step="0.1" name="rating" min="1" max="5" defaultValue={trip.rating ?? 5.0} className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="number" step="0.1" name="rating" min="1" max="5" defaultValue="5.0" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Jumlah Ulasan (Review Count)</label>
-              <input type="number" name="reviewCount" min="0" defaultValue={trip.reviewCount ?? 0} className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+              <input type="number" name="reviewCount" min="0" defaultValue="0" className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
             </div>
           </div>
 
-          {/* DYNAMIC PRICING OPTIONS SECTION */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
             <div className="flex justify-between items-center mb-4">
               <div>
@@ -170,13 +151,13 @@ export default function EditTripForm({ trip, initialPricingOptions, destinations
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Deskripsi Paket *</label>
-            <textarea name="description" defaultValue={trip.description} rows={5} required className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500 resize-none"></textarea>
+            <textarea name="description" rows={5} required placeholder="Jelaskan detail pengalaman yang akan didapatkan..." className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500 resize-none"></textarea>
           </div>
 
           <div className="pt-4 flex justify-end">
-            <button type="submit" disabled={loading} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-70">
+            <button type="submit" disabled={loading} className="bg-[#0A1F44] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#112a5c] transition-colors flex items-center gap-2 disabled:opacity-70">
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-              <span>Simpan Perubahan</span>
+              <span>Simpan Paket</span>
             </button>
           </div>
         </form>
