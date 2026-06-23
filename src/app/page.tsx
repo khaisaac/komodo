@@ -70,7 +70,7 @@ export default async function HomePage() {
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-md leading-tight">
             Explore Komodo & <br className="hidden md:block" /> Lombok by Liveaboard
           </h1>
-          <p className="text-lg md:text-xl text-slate-100 mb-10 max-w-2xl mx-auto drop-shadow-md">
+          <p className="hidden md:block text-lg md:text-xl text-slate-100 mb-10 max-w-2xl mx-auto drop-shadow-md">
             Experience the best island adventure with our curated selection of luxury phinisi and comfortable open trips.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

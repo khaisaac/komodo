@@ -82,11 +82,10 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
           
           <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Trip Description</h2>
-            <div className="prose prose-slate max-w-none text-slate-600">
-              {trip.description.split('\n').map((paragraph, idx) => (
-                <p key={idx} className="mb-4">{paragraph}</p>
-              ))}
-            </div>
+            <div 
+              className="prose prose-slate max-w-none text-slate-600 prose-headings:text-[#0A1F44] prose-a:text-blue-600"
+              dangerouslySetInnerHTML={{ __html: trip.description }}
+            />
           </div>
 
           {/* Include */}

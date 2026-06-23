@@ -74,13 +74,14 @@ export default async function LiveaboardDetailsPage({ params }: { params: Promis
 
           <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Boat Description</h2>
-            <div className="prose prose-slate max-w-none text-slate-600">
-              {boat.description ? boat.description.split('\n').map((paragraph, idx) => (
-                <p key={idx} className="mb-4">{paragraph}</p>
-              )) : (
-                <p>No description available.</p>
-              )}
-            </div>
+            {boat.description ? (
+              <div 
+                className="prose prose-slate max-w-none text-slate-600 prose-headings:text-[#0A1F44] prose-a:text-blue-600"
+                dangerouslySetInnerHTML={{ __html: boat.description }}
+              />
+            ) : (
+              <p className="text-slate-600">No description available.</p>
+            )}
           </div>
 
           {amenities.length > 0 && (

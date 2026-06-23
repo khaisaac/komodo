@@ -41,7 +41,7 @@ export default async function BlogIndexPage() {
                 <Link key={blog.id} href={`/blog/${blog.slug}`} className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 flex flex-col">
                   <div className="relative aspect-video w-full overflow-hidden bg-slate-200">
                     <Image 
-                      src={blog.thumbnail || "https://images.unsplash.com/photo-1512100356356-de1b84283e18?q=80&w=800&auto=format&fit=crop"}
+                      src={blog.thumbnail || "/hero.png"}
                       alt={blog.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"

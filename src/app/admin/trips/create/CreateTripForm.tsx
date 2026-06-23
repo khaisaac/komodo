@@ -6,12 +6,31 @@ import { createTrip } from '@/app/actions/trip';
 import { ArrowLeft, Save, Loader2, Plus, Trash2 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import MultiImageUpload from '@/components/MultiImageUpload';
+import dynamic from 'next/dynamic';
+import 'react-quill-new/dist/quill.snow.css';
+
+// Dynamically import ReactQuill to prevent SSR window issues
+const ReactQuill = dynamic(() => import('react-quill-new'), { 
+  ssr: false, 
+  loading: () => <div className="h-64 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-400">Loading Editor...</div> 
+});
 
 export default function CreateTripForm({ destinations }: { destinations: any[] }) {
   const [loading, setLoading] = useState(false);
   const [pricingOptions, setPricingOptions] = useState([{ name: '', price: '' }]);
   const [includes, setIncludes] = useState<string[]>(['']);
   const [excludes, setExcludes] = useState<string[]>(['']);
+  const [description, setDescription] = useState('');
+
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link'],
+      ['clean']
+    ],
+  };
 
   const addPricingOption = () => setPricingOptions([...pricingOptions, { name: '', price: '' }]);
   const removePricingOption = (index: number) => {
@@ -67,6 +86,7 @@ export default function CreateTripForm({ destinations }: { destinations: any[] }
         <form 
           action={async (formData) => {
             setLoading(true);
+            formData.append('description', description);
             await createTrip(formData);
           }} 
           className="space-y-6"
@@ -233,7 +253,15 @@ export default function CreateTripForm({ destinations }: { destinations: any[] }
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Deskripsi Paket *</label>
-            <textarea name="description" rows={5} required placeholder="Jelaskan detail pengalaman yang akan didapatkan..." className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500 resize-none"></textarea>
+            <div className="bg-white overflow-hidden rounded-xl text-slate-900 border border-slate-200">
+              <ReactQuill 
+                theme="snow" 
+                value={description} 
+                onChange={setDescription} 
+                modules={modules}
+                className="h-64 mb-12 text-slate-900"
+              />
+            </div>
           </div>
 
           <div className="pt-4 flex justify-end">

@@ -61,7 +61,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="max-w-5xl mx-auto px-4 mb-12">
           <div className="relative aspect-[21/9] w-full overflow-hidden rounded-2xl bg-slate-200 shadow-sm border border-slate-100">
             <Image 
-              src={blog.thumbnail || "https://images.unsplash.com/photo-1512100356356-de1b84283e18?q=80&w=2000&auto=format&fit=crop"}
+              src={blog.thumbnail || "/hero.png"}
               alt={blog.title}
               fill
               className="object-cover"

@@ -6,6 +6,14 @@ import { createBoat } from '@/app/actions/boat';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import MultiImageUpload from '@/components/MultiImageUpload';
+import dynamic from 'next/dynamic';
+import 'react-quill-new/dist/quill.snow.css';
+
+// Dynamically import ReactQuill to prevent SSR window issues
+const ReactQuill = dynamic(() => import('react-quill-new'), { 
+  ssr: false, 
+  loading: () => <div className="h-64 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-400">Loading Editor...</div> 
+});
 
 interface CreateBoatFormProps {
   destinations: { id: string; name: string }[];
@@ -13,6 +21,17 @@ interface CreateBoatFormProps {
 
 export default function CreateBoatForm({ destinations }: CreateBoatFormProps) {
   const [loading, setLoading] = useState(false);
+  const [description, setDescription] = useState('');
+
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link'],
+      ['clean']
+    ],
+  };
 
   return (
     <div className="max-w-4xl">
@@ -30,6 +49,7 @@ export default function CreateBoatForm({ destinations }: CreateBoatFormProps) {
         <form 
           action={async (formData) => {
             setLoading(true);
+            formData.append('description', description);
             await createBoat(formData);
           }} 
           className="space-y-6"
@@ -88,7 +108,15 @@ export default function CreateBoatForm({ destinations }: CreateBoatFormProps) {
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Deskripsi Kapal</label>
-            <textarea name="description" rows={5} placeholder="Fasilitas unggulan, spesifikasi mesin, dll..." className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500 resize-none"></textarea>
+            <div className="bg-white overflow-hidden rounded-xl text-slate-900 border border-slate-200">
+              <ReactQuill 
+                theme="snow" 
+                value={description} 
+                onChange={setDescription} 
+                modules={modules}
+                className="h-64 mb-12 text-slate-900"
+              />
+            </div>
           </div>
 
           <div className="pt-4 flex justify-end">

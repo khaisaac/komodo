@@ -5,6 +5,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { updateBlog } from '@/app/actions/blog';
+import ImageUpload from '@/components/ImageUpload';
 import 'react-quill-new/dist/quill.snow.css';
 
 // Dynamically import ReactQuill to prevent SSR window issues
@@ -64,8 +65,7 @@ export default function EditBlogForm({ blog }: EditBlogFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">URL Gambar Thumbnail *</label>
-            <input type="url" name="thumbnail" required defaultValue={blog.thumbnail || ''} className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:border-blue-500" />
+            <ImageUpload name="thumbnail" label="Gambar Thumbnail" initialImage={blog.thumbnail || undefined} />
           </div>
 
           <div>
