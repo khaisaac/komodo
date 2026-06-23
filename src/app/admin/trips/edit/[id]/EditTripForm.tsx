@@ -20,6 +20,7 @@ interface EditTripFormProps {
     gallery?: any;
     rating?: number;
     reviewCount?: number;
+    facilities?: { name: string; type: string }[];
   };
   initialPricingOptions: any[];
   destinations: any[];
@@ -28,6 +29,12 @@ interface EditTripFormProps {
 export default function EditTripForm({ trip, initialPricingOptions, destinations }: EditTripFormProps) {
   const [loading, setLoading] = useState(false);
   const [pricingOptions, setPricingOptions] = useState(initialPricingOptions);
+  const [includes, setIncludes] = useState<string[]>(
+    trip.facilities?.filter(f => f.type === 'INCLUSION').map(f => f.name) || ['']
+  );
+  const [excludes, setExcludes] = useState<string[]>(
+    trip.facilities?.filter(f => f.type === 'EXCLUSION').map(f => f.name) || ['']
+  );
 
   const addPricingOption = () => setPricingOptions([...pricingOptions, { name: '', price: '' }]);
   const removePricingOption = (index: number) => {
@@ -40,6 +47,31 @@ export default function EditTripForm({ trip, initialPricingOptions, destinations
     const newOptions = [...pricingOptions];
     newOptions[index][field] = value;
     setPricingOptions(newOptions);
+  };
+
+  const handleFacilityChange = (index: number, value: string, type: 'include' | 'exclude') => {
+    if (type === 'include') {
+      const newIncludes = [...includes];
+      newIncludes[index] = value;
+      setIncludes(newIncludes);
+    } else {
+      const newExcludes = [...excludes];
+      newExcludes[index] = value;
+      setExcludes(newExcludes);
+    }
+  };
+
+  const addFacility = (type: 'include' | 'exclude') => {
+    if (type === 'include') setIncludes([...includes, '']);
+    else setExcludes([...excludes, '']);
+  };
+
+  const removeFacility = (index: number, type: 'include' | 'exclude') => {
+    if (type === 'include') {
+      if (includes.length > 1) setIncludes(includes.filter((_, i) => i !== index));
+    } else {
+      if (excludes.length > 1) setExcludes(excludes.filter((_, i) => i !== index));
+    }
   };
 
   return (
@@ -165,6 +197,61 @@ export default function EditTripForm({ trip, initialPricingOptions, destinations
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* DYNAMIC INCLUDES & EXCLUDES SECTION */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-slate-900">Include</h3>
+                <button type="button" onClick={() => addFacility('include')} className="text-blue-600 text-sm font-semibold flex items-center gap-1 hover:text-blue-800">
+                  <Plus className="w-4 h-4" /> Tambah
+                </button>
+              </div>
+              <input type="hidden" name="includesStr" value={JSON.stringify(includes.filter(i => i.trim() !== ''))} />
+              <div className="space-y-3">
+                {includes.map((inc, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <input 
+                      type="text" 
+                      value={inc} 
+                      onChange={(e) => handleFacilityChange(idx, e.target.value, 'include')}
+                      placeholder="Misal: Boat Transportation"
+                      className="flex-1 bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                    />
+                    <button type="button" onClick={() => removeFacility(idx, 'include')} disabled={includes.length === 1} className="p-2 text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-slate-900">Exclude</h3>
+                <button type="button" onClick={() => addFacility('exclude')} className="text-blue-600 text-sm font-semibold flex items-center gap-1 hover:text-blue-800">
+                  <Plus className="w-4 h-4" /> Tambah
+                </button>
+              </div>
+              <input type="hidden" name="excludesStr" value={JSON.stringify(excludes.filter(i => i.trim() !== ''))} />
+              <div className="space-y-3">
+                {excludes.map((exc, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <input 
+                      type="text" 
+                      value={exc} 
+                      onChange={(e) => handleFacilityChange(idx, e.target.value, 'exclude')}
+                      placeholder="Misal: Personal Expenses"
+                      className="flex-1 bg-white border border-slate-200 text-slate-900 rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+                    />
+                    <button type="button" onClick={() => removeFacility(idx, 'exclude')} disabled={excludes.length === 1} className="p-2 text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

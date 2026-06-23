@@ -16,6 +16,8 @@ export async function createTrip(formData: FormData) {
   const pricingOptionsStr = formData.get('pricingOptionsStr') as string;
   const rating = parseFloat(formData.get('rating') as string) || 5.0;
   const reviewCount = parseInt(formData.get('reviewCount') as string) || 0;
+  const includesStr = formData.get('includesStr') as string;
+  const excludesStr = formData.get('excludesStr') as string;
   
   let pricingOptions = null;
   if (pricingOptionsStr) {
@@ -34,6 +36,20 @@ export async function createTrip(formData: FormData) {
   // Create slug from title
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
 
+  let facilities = [];
+  if (includesStr) {
+    try {
+      const inc = JSON.parse(includesStr);
+      inc.forEach((name: string) => facilities.push({ name, type: 'INCLUSION' }));
+    } catch(e) {}
+  }
+  if (excludesStr) {
+    try {
+      const exc = JSON.parse(excludesStr);
+      exc.forEach((name: string) => facilities.push({ name, type: 'EXCLUSION' }));
+    } catch(e) {}
+  }
+
   await prisma.trip.create({
     data: {
       title,
@@ -50,6 +66,9 @@ export async function createTrip(formData: FormData) {
       rating,
       reviewCount,
       status: 'PUBLISHED',
+      facilities: {
+        create: facilities
+      }
     }
   });
 
@@ -81,6 +100,8 @@ export async function updateTrip(id: string, formData: FormData) {
   const pricingOptionsStr = formData.get('pricingOptionsStr') as string;
   const rating = parseFloat(formData.get('rating') as string) || 5.0;
   const reviewCount = parseInt(formData.get('reviewCount') as string) || 0;
+  const includesStr = formData.get('includesStr') as string;
+  const excludesStr = formData.get('excludesStr') as string;
   
   let pricingOptions = null;
   if (pricingOptionsStr) {
@@ -98,6 +119,21 @@ export async function updateTrip(id: string, formData: FormData) {
   // Update slug based on title if necessary, but usually better to keep original or regenerate
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
 
+  let facilities = [];
+  if (includesStr) {
+    try {
+      const inc = JSON.parse(includesStr);
+      inc.forEach((name: string) => facilities.push({ name, type: 'INCLUSION' }));
+    } catch(e) {}
+  }
+  if (excludesStr) {
+    try {
+      const exc = JSON.parse(excludesStr);
+      exc.forEach((name: string) => facilities.push({ name, type: 'EXCLUSION' }));
+    } catch(e) {}
+  }
+
+
   await prisma.trip.update({
     where: { id },
     data: {
@@ -113,6 +149,10 @@ export async function updateTrip(id: string, formData: FormData) {
       gallery: galleryStr ? JSON.parse(galleryStr) : undefined,
       rating,
       reviewCount,
+      facilities: {
+        deleteMany: {},
+        create: facilities
+      }
     }
   });
 

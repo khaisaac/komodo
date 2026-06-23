@@ -7,7 +7,8 @@ export default async function EditTripPage({ params }: { params: Promise<{ id: s
   const resolvedParams = await params;
   
   const trip = await prisma.trip.findUnique({
-    where: { id: resolvedParams.id }
+    where: { id: resolvedParams.id },
+    include: { facilities: true }
   });
 
   if (!trip) {
@@ -36,6 +37,7 @@ export default async function EditTripPage({ params }: { params: Promise<{ id: s
         featuredImage: trip.featuredImage || '',
         description: trip.description,
         gallery: trip.gallery,
+        facilities: trip.facilities,
       }} 
       initialPricingOptions={parsedPricingOptions} 
       destinations={destinations}

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { notFound } from 'next/navigation';
-import { MapPin, Clock, CheckCircle, Star } from 'lucide-react';
+import { MapPin, Clock, CheckCircle, XCircle, Star } from 'lucide-react';
 import BookingForm from './BookingForm';
 import GalleryGrid from '@/components/GalleryGrid';
 
@@ -20,7 +20,7 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
   
   const trip = await prisma.trip.findUnique({
     where: { slug },
-    include: { destination: true }
+    include: { destination: true, facilities: true }
   });
 
   if (!trip) {
@@ -89,18 +89,35 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ sl
             </div>
           </div>
 
-          {/* Just dummy inclusions for UI */}
-          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Inclusions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {['Boat Transportation (Cabin/AC)', '3x Meals a Day', 'Snorkeling Equipment', 'Experienced Local Guide', 'Premium Documentation', 'Mineral Water, Coffee, Tea'].map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                  <span className="text-slate-700">{item}</span>
-                </div>
-              ))}
+          {/* Include */}
+          {trip.facilities && trip.facilities.filter(f => f.type === 'INCLUSION').length > 0 && (
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 mb-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Include</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {trip.facilities.filter(f => f.type === 'INCLUSION').map((item) => (
+                  <div key={item.id} className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                    <span className="text-slate-700">{item.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Exclude */}
+          {trip.facilities && trip.facilities.filter(f => f.type === 'EXCLUSION').length > 0 && (
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 mb-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Exclude</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {trip.facilities.filter(f => f.type === 'EXCLUSION').map((item) => (
+                  <div key={item.id} className="flex items-start gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                    <span className="text-slate-700">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* RIGHT COLUMN: BOOKING FORM */}
