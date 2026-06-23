@@ -36,7 +36,7 @@ export async function createTrip(formData: FormData) {
   // Create slug from title
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
 
-  let facilities = [];
+  let facilities: any[] = [];
   if (includesStr) {
     try {
       const inc = JSON.parse(includesStr);
@@ -119,7 +119,7 @@ export async function updateTrip(id: string, formData: FormData) {
   // Update slug based on title if necessary, but usually better to keep original or regenerate
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
 
-  let facilities = [];
+  let facilities: any[] = [];
   if (includesStr) {
     try {
       const inc = JSON.parse(includesStr);
