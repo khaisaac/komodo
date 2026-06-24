@@ -54,7 +54,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="font-bold mb-1">Office Address</h4>
-                    <p className="text-sm text-slate-300 leading-relaxed">Jl. Soekarno Hatta, Labuan Bajo, Manggarai Barat, Nusa Tenggara Timur, Indonesia 86554</p>
+                    <p className="text-sm text-slate-300 leading-relaxed">Jalan Senaru Bayan, Lombok Utara</p>
                   </div>
                 </div>
 

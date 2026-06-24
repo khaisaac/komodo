@@ -40,7 +40,7 @@ export default function Footer() {
           <ul className="space-y-4 text-sm">
             <li className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-slate-400 shrink-0" />
-              <span>Labuan Bajo, Manggarai Barat, Nusa Tenggara Timur, Indonesia</span>
+              <span>Jalan Senaru Bayan, Lombok Utara</span>
             </li>
             <li className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-slate-400 shrink-0" />
